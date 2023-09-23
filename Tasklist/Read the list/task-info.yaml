@@ -108,5 +108,8 @@ files:
     \ = trimOutput}\n}\n\n\n"
     learner_created: false
 feedback_link: https://hyperskill.org/projects/237/stages/1188/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sat, 23 Sep 2023 15:40:46 UTC"
 record: -1

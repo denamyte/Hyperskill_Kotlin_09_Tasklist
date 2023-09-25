@@ -252,6 +252,12 @@ files:
     
     
     learner_created: false
+  - name: src/tasklist/Menu.kt
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/237/stages/1189/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sun, 24 Sep 2023 23:49:49 UTC"
 record: -1

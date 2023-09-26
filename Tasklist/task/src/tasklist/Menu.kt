@@ -1,7 +1,10 @@
 package tasklist
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+
 class Menu {
-    private val tasks = mutableListOf<List<String>>()
+    private val tasks = mutableListOf<Task>()
 
     fun run() {
         do {
@@ -18,23 +21,60 @@ class Menu {
     }
 
     private fun add() {
+        val p = inputPriority()
+        val dt = inputTime(inputDate())
+
         println("Input a new task (enter a blank line to end):")
         generateSequence { readln().trim() }
             .takeWhile { it.isNotEmpty() }
             .toList()
-            .let {
-                if (it.isEmpty()) println("The task is blank")
-                else tasks.add(it)
+            .let { lines ->
+                if (lines.isEmpty()) println("The task is blank")
+                else tasks.add(Task(p, dt, lines))
             }
+    }
+
+    private fun inputPriority(): Priority {
+        while (true) {
+            println("Input the task priority (C, H, N, L):")
+            try {
+                return Priority.fromLabel(readln().uppercase())
+            } catch (_: Exception) { }
+        }
+    }
+
+    private fun inputDate(): LocalDate {
+        while (true) {
+            println("Input the date (yyyy-mm-dd):")
+            try {
+                val (y, m, d) = Utils.checkDate(readln())
+                    .split("-").map(String::toInt)
+                return LocalDate(y, m, d)
+            } catch (_: Exception) {
+                println("The input date is invalid")
+            }
+        }
+    }
+
+    private fun inputTime(date: LocalDate): LocalDateTime {
+        while (true) {
+            println("Input the time (hh:mm):")
+            try {
+                val (h, min) = Utils.checkTime(readln())
+                    .split(":").map(String::toInt)
+                return LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, h, min)
+            } catch (_: Exception) {
+                println("The input time is invalid")
+            }
+        }
     }
 
     private fun print() {
         if (tasks.isEmpty()) "No tasks have been input"
         else {
             tasks.mapIndexed { i, task ->
-                val s = "%-3d${task.first()}".format(i + 1)
-                if (task.size == 1) s
-                else s + "\n" + task.drop(1).joinToString("\n") { "   $it" }
+                "%-3d${task.dateTimePriority}\n".format(i + 1) +
+                        task.lines.joinToString("\n") { "   $it" }
             }.joinToString("\n\n")
         }
             .let(::println)

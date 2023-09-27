@@ -575,6 +575,141 @@ files:
     
     
     learner_created: false
+  - name: src/tasklist/Utils.kt
+    visible: true
+    text: |-
+      package tasklist
+      
+      class Utils {
+          companion object {
+              private val DATE_REGEX = Regex("""\d{4}(-\d{1,2}){1,2}""")
+              fun checkDate(raw: String): String {
+                  if (DATE_REGEX.matches(raw)) return raw
+                  else throw Exception()
+              }
+      
+              private val TIME_REGEX = Regex("""\d{1,2}:\d{1,2}""")
+              fun checkTime(raw: String): String {
+                  if (TIME_REGEX.matches(raw)) return raw
+                  else throw Exception()
+              }
+          }
+      }
+    learner_created: true
+  - name: src/tasklist/Menu.kt
+    visible: true
+    text: |-
+      package tasklist
+      
+      import kotlinx.datetime.LocalDate
+      import kotlinx.datetime.LocalDateTime
+      
+      class Menu {
+          private val tasks = mutableListOf<Task>()
+      
+          fun run() {
+              do {
+                  println("Input an action (add, print, end):")
+                  val cmd = readln().lowercase()
+                  when (cmd) {
+                      "add" -> add()
+                      "print" -> print()
+                      "end" -> break
+                      else -> println("The input action is invalid\n")
+                  }
+              } while (true)
+              println("Tasklist exiting!")
+          }
+      
+          private fun add() {
+              val p = inputPriority()
+              val dt = inputTime(inputDate())
+      
+              println("Input a new task (enter a blank line to end):")
+              generateSequence { readln().trim() }
+                  .takeWhile { it.isNotEmpty() }
+                  .toList()
+                  .let { lines ->
+                      if (lines.isEmpty()) println("The task is blank")
+                      else tasks.add(Task(p, dt, lines))
+                  }
+          }
+      
+          private fun inputPriority(): Priority {
+              while (true) {
+                  println("Input the task priority (C, H, N, L):")
+                  try {
+                      return Priority.fromLabel(readln().uppercase())
+                  } catch (_: Exception) { }
+              }
+          }
+      
+          private fun inputDate(): LocalDate {
+              while (true) {
+                  println("Input the date (yyyy-mm-dd):")
+                  try {
+                      val (y, m, d) = Utils.checkDate(readln())
+                          .split("-").map(String::toInt)
+                      return LocalDate(y, m, d)
+                  } catch (_: Exception) {
+                      println("The input date is invalid")
+                  }
+              }
+          }
+      
+          private fun inputTime(date: LocalDate): LocalDateTime {
+              while (true) {
+                  println("Input the time (hh:mm):")
+                  try {
+                      val (h, min) = Utils.checkTime(readln())
+                          .split(":").map(String::toInt)
+                      return LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, h, min)
+                  } catch (_: Exception) {
+                      println("The input time is invalid")
+                  }
+              }
+          }
+      
+          private fun print() {
+              if (tasks.isEmpty()) "No tasks have been input"
+              else {
+                  tasks.mapIndexed { i, task ->
+                      "%-3d${task.dateTimePriority}\n".format(i + 1) +
+                              task.lines.joinToString("\n") { "   $it" }
+                  }.joinToString("\n\n")
+              }
+                  .let(::println)
+                  .also { println() }
+          }
+      }
+    learner_created: true
+  - name: src/tasklist/Task.kt
+    visible: true
+    text: |
+      package tasklist
+      
+      import kotlinx.datetime.LocalDateTime
+      
+      data class Task(
+          val priority: Priority,
+          val dt: LocalDateTime,
+          val lines: List<String>) {
+      
+          val dateTimePriority: String get() {
+              val dtStr = dt.toString()
+              return buildString {
+                  append(dtStr.substring(0, 10))
+                  append(" ")
+                  append(dtStr.substring(11, 16))
+                  append(" ")
+                  append(priority.label)
+              }
+          }
+      }
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/237/stages/1191/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Wed, 27 Sep 2023 19:16:56 UTC"
 record: -1

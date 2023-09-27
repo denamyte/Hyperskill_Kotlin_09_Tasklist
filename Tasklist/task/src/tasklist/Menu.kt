@@ -8,11 +8,13 @@ class Menu {
 
     fun run() {
         do {
-            println("Input an action (add, print, end):")
+            println("Input an action (add, print, edit, delete, end):")
             val cmd = readln().lowercase()
             when (cmd) {
                 "add" -> add()
                 "print" -> print()
+                "edit" -> edit()
+                "delete" -> delete()
                 "end" -> break
                 else -> println("The input action is invalid\n")
             }
@@ -21,25 +23,30 @@ class Menu {
     }
 
     private fun add() {
-        val p = inputPriority()
-        val dt = inputTime(inputDate())
+        val p: String = inputPriority()
+        val dt: LocalDateTime = inputTime(inputDate())
 
+        inputTaskLines().also {
+            if (it.isNotEmpty()) tasks.add(Task(p, dt, it))
+        }
+    }
+
+    private fun inputTaskLines(): List<String> {
         println("Input a new task (enter a blank line to end):")
-        generateSequence { readln().trim() }
+        return generateSequence { readln().trim() }
             .takeWhile { it.isNotEmpty() }
-            .toList()
-            .let { lines ->
-                if (lines.isEmpty()) println("The task is blank")
-                else tasks.add(Task(p, dt, lines))
+            .toList().also {
+                if (it.isEmpty()) println("The task is blank")
             }
     }
 
-    private fun inputPriority(): Priority {
+    private fun inputPriority(): String {
         while (true) {
             println("Input the task priority (C, H, N, L):")
-            try {
-                return Priority.fromLabel(readln().uppercase())
-            } catch (_: Exception) { }
+            readln().uppercase().let {
+                if (Utils.isValidPriorityTag(it))
+                    return it
+            }
         }
     }
 
@@ -79,5 +86,51 @@ class Menu {
         }
             .let(::println)
             .also { println() }
+    }
+
+    private fun edit() {
+        this.print()
+        if (tasks.isEmpty()) return
+
+        val task = tasks[inputTaskNumber() - 1]
+        when (inputFieldToEdit()) {
+            "priority" -> task.priorityTag = inputPriority()
+            "date" -> task.setDate(inputDate())
+            "time" -> task.dt = inputTime(task.dt.date)
+            "task" -> inputTaskLines().also { if (it.isNotEmpty()) task.lines = it }
+        }
+        println("The task is changed")
+    }
+
+    private fun inputFieldToEdit(): String {
+        while (true) {
+            println("Input a field to edit (priority, date, time, task):")
+            val field = readln()
+            if (field !in Utils.EDIT_FIELDS) {
+                println("Invalid field")
+                continue
+            }
+            return field
+        }
+    }
+
+    private fun delete() {
+        this.print()
+        if (tasks.isEmpty()) return
+
+        tasks.removeAt(inputTaskNumber() - 1)
+        println("The task is deleted")
+    }
+
+    private fun inputTaskNumber(): Int {
+        while (true)
+            try {
+                println("Input the task number (1-${tasks.size}):")
+                return readln().toInt().also {
+                    if (it <= 0 || it > tasks.size) throw Exception()
+                }
+            } catch (_: Exception) {
+                println("Invalid task number")
+            }
     }
 }

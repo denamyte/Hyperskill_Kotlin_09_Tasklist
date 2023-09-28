@@ -2,3 +2,4 @@ content:
   - Property accessors
   - Kotlinx datetime library
   - Jumps and returns
+  - Destructuring declarations

@@ -76,17 +76,7 @@ class Menu {
         }
     }
 
-    private fun print() {
-        if (tasks.isEmpty()) "No tasks have been input"
-        else {
-            tasks.mapIndexed { i, task ->
-                "%-3d${task.dateTimePriority}\n".format(i + 1) +
-                        task.lines.joinToString("\n") { "   $it" }
-            }.joinToString("\n\n")
-        }
-            .let(::println)
-            .also { println() }
-    }
+    private fun print() = TaskPrinter.print(tasks)
 
     private fun edit() {
         this.print()
@@ -97,7 +87,7 @@ class Menu {
             "priority" -> task.priorityTag = inputPriority()
             "date" -> task.setDate(inputDate())
             "time" -> task.dt = inputTime(task.dt.date)
-            "task" -> inputTaskLines().also { if (it.isNotEmpty()) task.lines = it }
+            "task" -> inputTaskLines().let { if (it.isNotEmpty()) task.lines = it }
         }
         println("The task is changed")
     }

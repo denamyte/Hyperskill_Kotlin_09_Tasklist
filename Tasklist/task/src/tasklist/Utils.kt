@@ -8,14 +8,13 @@ class Utils {
         fun isValidPriorityTag(tag: String) = tag.length == 1 && tag in PRIORITIES
 
         private val DATE_REGEX = Regex("""\d{4}(-\d{1,2}){1,2}""")
-        fun checkDate(raw: String): String {
-            if (DATE_REGEX.matches(raw)) return raw
-            else throw Exception()
-        }
+        fun checkDate(s: String): String = checkDT(DATE_REGEX, s)
 
         private val TIME_REGEX = Regex("""\d{1,2}:\d{1,2}""")
-        fun checkTime(raw: String): String {
-            if (TIME_REGEX.matches(raw)) return raw
+        fun checkTime(s: String): String = checkDT(TIME_REGEX, s)
+
+        private fun checkDT(r: Regex, s: String): String {
+            if (r.matches(s)) return s
             else throw Exception()
         }
 

@@ -4,9 +4,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 
 class Menu {
-    private val tasks = mutableListOf<Task>()
+    private lateinit var tasks: MutableList<Task>
 
     fun run() {
+        tasks = MoshiSaveLoad.load().toMutableList()
         do {
             println("Input an action (add, print, edit, delete, end):")
             val cmd = readln().lowercase()
@@ -19,6 +20,7 @@ class Menu {
                 else -> println("The input action is invalid\n")
             }
         } while (true)
+        MoshiSaveLoad.save(tasks)
         println("Tasklist exiting!")
     }
 
